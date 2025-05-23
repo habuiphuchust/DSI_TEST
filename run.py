@@ -14,7 +14,6 @@ from transformers import (
 from trainer import DSITrainer, DocTqueryTrainer
 import numpy as np
 import torch
-import wandb
 from torch.utils.data import DataLoader
 from dataclasses import dataclass, field
 from typing import Optional
