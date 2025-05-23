@@ -67,7 +67,7 @@ def main():
     training_args, run_args = parser.parse_args_into_dataclasses()
 
     # We use wandb logger: https://wandb.ai/site.
-    if training_args.local_rank == 0:  # only on main process
+    # if training_args.local_rank == 0:  # only on main process
         # Initialize wandb run
         # wandb.login()
         # wandb.init(project="DSI", name=training_args.run_name)
