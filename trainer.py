@@ -11,7 +11,7 @@ class DSITrainer(Trainer):
         self.restrict_decode_vocab = restrict_decode_vocab
         self.id_max_length = id_max_length
 
-    def compute_loss(self, model, inputs, return_outputs=False):
+    def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
         loss = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'], labels=inputs['labels']).loss
         if return_outputs:
             return loss, [None, None]  # fake outputs
