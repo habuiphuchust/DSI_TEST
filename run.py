@@ -118,7 +118,6 @@ def main():
                 tokenizer,
                 padding='longest',
             ),
-            push_to_hub=True,
         )
         trainer.train()
 
