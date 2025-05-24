@@ -8,9 +8,12 @@ from transformers import (
     MT5Tokenizer,
     MT5TokenizerFast,
     MT5ForConditionalGeneration,
+    T5ForConditionalGeneration,
+    RobertaTokenizer,
     HfArgumentParser,
     set_seed,
 )
+
 from trainer import DSITrainer, DocTqueryTrainer
 import numpy as np
 import torch
@@ -72,20 +75,26 @@ def main():
         # wandb.login()
         # wandb.init(project="DSI", name=training_args.run_name)
 
-    if 'mt5' in run_args.model_name:
-        tokenizer = MT5Tokenizer.from_pretrained(run_args.model_name, cache_dir='cache')
-        fast_tokenizer = MT5TokenizerFast.from_pretrained(run_args.model_name, cache_dir='cache')
-        if run_args.model_path:
-            model = MT5ForConditionalGeneration.from_pretrained(run_args.model_path, cache_dir='cache')
+    if 'codet5' in run_args.model_name:
+        tokenizer = RobertaTokenizer.from_pretrained(run_args.model_name, cache_dir='cache')
+        model = T5ForConditionalGeneration.from_pretrained(run_args.model_name, cache_dir='cache')
+        fast_tokenizer = RobertaTokenizer.from_pretrained(run_args.model_name, cache_dir='cache')
+
+    else: 
+        if 'mt5' in run_args.model_name:
+            tokenizer = MT5Tokenizer.from_pretrained(run_args.model_name, cache_dir='cache')
+            fast_tokenizer = MT5TokenizerFast.from_pretrained(run_args.model_name, cache_dir='cache')
+            if run_args.model_path:
+                model = MT5ForConditionalGeneration.from_pretrained(run_args.model_path, cache_dir='cache')
+            else:
+                model = MT5ForConditionalGeneration.from_pretrained(run_args.model_name, cache_dir='cache')
         else:
-            model = MT5ForConditionalGeneration.from_pretrained(run_args.model_name, cache_dir='cache')
-    else:
-        tokenizer = T5Tokenizer.from_pretrained(run_args.model_name, cache_dir='cache')
-        fast_tokenizer = T5TokenizerFast.from_pretrained(run_args.model_name, cache_dir='cache')
-        if run_args.model_path:
-            model = T5ForConditionalGeneration.from_pretrained(run_args.model_path, cache_dir='cache')
-        else:
-            model = T5ForConditionalGeneration.from_pretrained(run_args.model_name, cache_dir='cache')
+            tokenizer = T5Tokenizer.from_pretrained(run_args.model_name, cache_dir='cache')
+            fast_tokenizer = T5TokenizerFast.from_pretrained(run_args.model_name, cache_dir='cache')
+            if run_args.model_path:
+                model = T5ForConditionalGeneration.from_pretrained(run_args.model_path, cache_dir='cache')
+            else:
+                model = T5ForConditionalGeneration.from_pretrained(run_args.model_name, cache_dir='cache')
 
     if run_args.task == "docTquery":
         train_dataset = IndexingTrainDataset(path_to_data=run_args.train_file,
@@ -109,6 +118,7 @@ def main():
                 tokenizer,
                 padding='longest',
             ),
+            push_to_hub=True,
         )
         trainer.train()
 
@@ -153,7 +163,7 @@ def main():
             ),
             compute_metrics=make_compute_metrics(fast_tokenizer, train_dataset.valid_ids),
             restrict_decode_vocab=restrict_decode_vocab,
-            id_max_length=run_args.id_max_length
+            id_max_length=run_args.id_max_length,
         )
         trainer.train()
 
