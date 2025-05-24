@@ -77,7 +77,7 @@ class DocTqueryTrainer(Trainer):
         super().__init__(**kwds)
         self.do_generation = do_generation
 
-    def compute_loss(self, model, inputs, return_outputs=False):
+    def compute_loss(self, model, inputs, return_outputs=False,  num_items_in_batch=32):
         loss = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'], labels=inputs['labels']).loss
         if return_outputs:
             return loss, [None, None]  # fake outputs
