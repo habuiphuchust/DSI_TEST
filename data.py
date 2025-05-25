@@ -65,7 +65,6 @@ class GenerateDataset(Dataset):
         self.data = []
         with open(path_to_data, 'r') as f:
             for data in f:
-                print(data)
                 if 'xorqa' in path_to_data:
                     docid, passage, title = data.split('\t')
                     for lang in self.lang2mT5.values():
