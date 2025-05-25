@@ -7,6 +7,8 @@ import warnings
 warnings.filterwarnings("ignore")
 import logging
 # logging.getLogger().setLevel(logging.ERROR)
+logging.getLogger("transformers").setLevel(logging.ERROR)
+
 class SuppressTokenizerDeprecation(logging.Filter):
     def filter(self, record):
         return "is now deprecated" not in record.getMessage()

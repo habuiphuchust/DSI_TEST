@@ -70,7 +70,7 @@ class GenerateDataset(Dataset):
                     for lang in self.lang2mT5.values():
                         self.data.append((docid, f'Generate a {lang} question for this passage: {title} {passage}'))
                 else:
-                    docid, passage = data.split('\t')
+                    docid, passage = data.split('+///+')
                     self.data.append((docid, f'{passage}'))
 
         self.max_length = max_length
