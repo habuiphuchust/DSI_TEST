@@ -3,17 +3,7 @@ from transformers.trainer import Trainer
 from torch import nn
 from torch.utils.data import Dataset
 import torch
-import warnings
-warnings.filterwarnings("ignore")
-import logging
-# logging.getLogger().setLevel(logging.ERROR)
-logging.getLogger("transformers").setLevel(logging.ERROR)
 
-class SuppressTokenizerDeprecation(logging.Filter):
-    def filter(self, record):
-        return "is now deprecated" not in record.getMessage()
-
-logging.getLogger("transformers").addFilter(SuppressTokenizerDeprecation())
 
 class DSITrainer(Trainer):
     def __init__(self, restrict_decode_vocab, id_max_length, **kwds):
