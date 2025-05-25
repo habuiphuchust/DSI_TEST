@@ -23,7 +23,8 @@ from typing import Optional
 import json
 from tqdm import tqdm
 set_seed(313)
-
+import warnings
+warnings.filterwarnings("ignore")
 
 @dataclass
 class RunArguments:
