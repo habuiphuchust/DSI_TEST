@@ -23,8 +23,7 @@ from typing import Optional
 import json
 from tqdm import tqdm
 set_seed(313)
-import warnings
-warnings.filterwarnings("ignore")
+
 
 @dataclass
 class RunArguments:
@@ -41,28 +40,56 @@ class RunArguments:
     q_max_length: Optional[int] = field(default=32)
 
 
+# def make_compute_metrics(tokenizer, valid_ids):
+
+#     def compute_metrics(eval_preds):
+#         hit_at_1 = 0
+#         hit_at_10 = 0
+#         for beams, label in zip(eval_preds.predictions, eval_preds.label_ids):
+#             rank_list = tokenizer.batch_decode(beams,
+#                                                skip_special_tokens=True)
+#             label_id = tokenizer.decode(label, skip_special_tokens=True)
+#             # filter out duplicates and invalid docids
+#             filtered_rank_list = []
+#             for docid in rank_list:
+#                 if docid not in filtered_rank_list and docid in valid_ids:
+#                     filtered_rank_list.append(docid)
+
+#             hits = np.where(np.array(filtered_rank_list)[:10] == label_id)[0]
+#             if len(hits) != 0:
+#                 hit_at_10 += 1
+#                 if hits[0] == 0:
+#                     hit_at_1 += 1
+#         return {"Hits@1": hit_at_1 / len(eval_preds.predictions), "Hits@10": hit_at_10 / len(eval_preds.predictions)}
+#     return compute_metrics
+
 def make_compute_metrics(tokenizer, valid_ids):
 
     def compute_metrics(eval_preds):
-        hit_at_1 = 0
-        hit_at_10 = 0
+        reciprocal_ranks = []
+
         for beams, label in zip(eval_preds.predictions, eval_preds.label_ids):
-            rank_list = tokenizer.batch_decode(beams,
-                                               skip_special_tokens=True)
+            rank_list = tokenizer.batch_decode(beams, skip_special_tokens=True)
             label_id = tokenizer.decode(label, skip_special_tokens=True)
-            # filter out duplicates and invalid docids
+
+            # Lọc trùng và invalid ID
             filtered_rank_list = []
             for docid in rank_list:
                 if docid not in filtered_rank_list and docid in valid_ids:
                     filtered_rank_list.append(docid)
 
-            hits = np.where(np.array(filtered_rank_list)[:10] == label_id)[0]
-            if len(hits) != 0:
-                hit_at_10 += 1
-                if hits[0] == 0:
-                    hit_at_1 += 1
-        return {"Hits@1": hit_at_1 / len(eval_preds.predictions), "Hits@10": hit_at_10 / len(eval_preds.predictions)}
+            # Tính reciprocal rank
+            try:
+                rank_position = filtered_rank_list.index(label_id)
+                reciprocal_ranks.append(1 / (rank_position + 1))
+            except ValueError:
+                reciprocal_ranks.append(0.0)  # Không tìm thấy → RR = 0
+
+        mrr = np.mean(reciprocal_ranks)
+        return {"MRR": mrr}
+
     return compute_metrics
+
 
 
 def main():

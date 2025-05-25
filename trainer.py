@@ -11,7 +11,7 @@ class SuppressTokenizerDeprecation(logging.Filter):
     def filter(self, record):
         return "Trainer.tokenizer is now deprecated. You should use Trainer.processing_class instead." not in record.getMessage()
 
-logging.getLogger("transformers").addFilter(SuppressTokenizerDeprecation())
+logging.getLogger("transformers").addFilter(SuppressTokenizerDeprecation()).setLevel(logging.ERROR)
 
 class DSITrainer(Trainer):
     def __init__(self, restrict_decode_vocab, id_max_length, **kwds):
