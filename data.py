@@ -69,11 +69,9 @@ class GenerateDataset(Dataset):
                     docid, passage, title = data.split('\t')
                     for lang in self.lang2mT5.values():
                         self.data.append((docid, f'Generate a {lang} question for this passage: {title} {passage}'))
-                elif 'msmarco' in path_to_data:
+                else:
                     docid, passage = data.split('\t')
                     self.data.append((docid, f'{passage}'))
-                else:
-                    raise NotImplementedError(f"dataset {path_to_data} for docTquery generation is not defined.")
 
         self.max_length = max_length
         self.tokenizer = tokenizer
